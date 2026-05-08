@@ -3,9 +3,14 @@ using MyProject.Domain.Interfaces;
 
 namespace MyProject.Infrastructure.Repositories;
 
-public class InMemoryCarRepository : ICarRepository
+public class CarRepository : ICarRepository
 {
-    private readonly List<Car> _cars = new();
+    private readonly List<Car> _cars;
+
+    public CarRepository(List<Car> initialCars)
+    {
+        _cars = initialCars ?? new List<Car>();
+    }
 
     public void Add(Car car)
     {

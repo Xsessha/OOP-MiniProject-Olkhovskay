@@ -16,21 +16,20 @@ sequenceDiagram
 
     Service->>Repo: GetById(carId)
     activate Repo
-    
     Repo-->>Service: Return Car object
     deactivate Repo
 
     alt Car is available
-        Service->>Car: Rent() / IsAvailable = false
+        Service->>Car: Rent()
         activate Car
-        Car-->>Service: Status updated
+        Car-->>Service: Updated state
         deactivate Car
-        Service-->>Console: Return Success
-    else Car not found / unavailable
-        Service-->>Console: Return Error
-    end
-    
-    deactivate Service
 
-    Console-->>User: Display final result
+        Service-->>Console: Success
+    else Car not found / unavailable
+        Service-->>Console: Error
+    end
+
+    deactivate Service
+    Console-->>User: Result shown
     deactivate Console

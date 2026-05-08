@@ -1,53 +1,83 @@
-using MyProject.Application.Services;
-using MyProject.Domain.Entities;
-using MyProject.Infrastructure.Repositories;
 using Xunit;
+using MyProject.Domain.Entities;
+using MyProject.Domain.Exceptions;
+using MyProject.Infrastructure.Repositories;
+using MyProject.Application.Services;
+
+namespace MyProject.Tests.Application;
 
 public class RentalServiceTests
 {
-    [Fact]
-    public void ShouldRentCar()
+    private RentalService CreateService(out InMemoryCarRepository repo)
     {
-        var repo = new InMemoryCarRepository();
-        var service = new RentalService(repo);
+        repo = new InMemoryCarRepository();
+        return new RentalService(repo, new InMemoryRentalRepository());
+    }
+
+    [Fact]
+    public void Should_Rent_Car()
+    {
+        var service = CreateService(out var repo);
 
         var car = new Car("BMW");
         repo.Add(car);
 
-        service.RentCar("User", car.Id);
+        service.RentCar("User", "economy", car.Id, 3);
 
         Assert.False(car.IsAvailable);
     }
-    [Fact]
-    public void ShouldThrowIfCarAlreadyRented()
-{
-    var repo = new InMemoryCarRepository();
-    var service = new RentalService(repo);
-
-    var car = new Car("BMW");
-    repo.Add(car);
-
-    service.RentCar("User", car.Id);
-
-    Assert.Throws<InvalidOperationException>(() =>
-        service.RentCar("User", car.Id));
-}
 
     [Fact]
-    public void ShouldHandleMultipleCars()
+    public void Should_Return_Car()
     {
-    var repo = new InMemoryCarRepository();
-    var service = new RentalService(repo);
+        var service = CreateService(out var repo);
 
-    var car1 = new Car("BMW");
-    var car2 = new Car("Audi");
+        var car = new Car("BMW");
+        repo.Add(car);
 
-    repo.Add(car1);
-    repo.Add(car2);
+        service.RentCar("User", "economy", car.Id, 3);
+        service.ReturnCar(car.Id);
 
-    service.RentCar("User", car1.Id);
+        Assert.True(car.IsAvailable);
+    }
 
-    Assert.False(car1.IsAvailable);
-    Assert.True(car2.IsAvailable);
+    [Fact]
+    public void Should_Handle_Multiple_Cars()
+    {
+        var service = CreateService(out var repo);
+
+        var c1 = new Car("BMW");
+        var c2 = new Car("Audi");
+
+        repo.Add(c1);
+        repo.Add(c2);
+
+        service.RentCar("User", "economy", c1.Id, 3);
+
+        Assert.False(c1.IsAvailable);
+        Assert.True(c2.IsAvailable);
+    }
+
+    [Fact]
+    public void Full_Flow_Should_Work()
+    {
+        var service = CreateService(out var repo);
+
+        var car = new Car("BMW");
+        repo.Add(car);
+
+        service.RentCar("User", "economy", car.Id, 3);
+        service.ReturnCar(car.Id);
+
+        Assert.True(car.IsAvailable);
+    }
+
+    [Fact]
+    public void Should_Not_Rent_Invalid_Car()
+    {
+        var service = CreateService(out var repo);
+
+        Assert.Throws<CarNotFoundException>(() =>
+            service.RentCar("User", "economy", Guid.NewGuid(), 3));
     }
 }

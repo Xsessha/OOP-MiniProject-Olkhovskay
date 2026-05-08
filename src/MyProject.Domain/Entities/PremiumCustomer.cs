@@ -4,5 +4,6 @@ public class PremiumCustomer : Customer
 {
     public PremiumCustomer(string name) : base(name) { }
 
-    public override decimal GetDiscount() => 0.2m;
+    public override string CustomerType => "Premium";
+    public override decimal GetDiscount() => 0.20m;
 }

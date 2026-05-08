@@ -2,25 +2,65 @@ name: .NET CI
 
 on:
   push:
+    branches: [ dev, master ]
   pull_request:
+    branches: [ dev, master ]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 8.0.x
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Restore
-      run: dotnet restore
+      - name: Restore
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
 
-    - name: Test
-      run: dotnet test --no-build
+      - name: Test with coverage
+        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Add tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Generate report
+        run: |
+          reportgenerator \
+            -reports:"**/coverage.cobertura.xml" \
+            -targetdir:"coverage-report" \
+            -reporttypes:"Html;Cobertura"
+
+      - name: Quality Gate (80%)
+        run: |
+          FILE=$(find . -name "coverage.cobertura.xml" | head -1)
+
+          if [ -z "$FILE" ]; then
+            echo "coverage file not found"
+            exit 1
+          fi
+
+          COVERAGE=$(grep 'line-rate' "$FILE" | head -1 | sed 's/.*line-rate="\([0-9.]*\)".*/\1/')
+
+          echo "Coverage: $COVERAGE"
+
+          if (( $(echo "$COVERAGE < 0.80" | bc -l) )); then
+            echo "QUALITY GATE FAILED"
+            exit 1
+          fi
+
+          echo "QUALITY GATE PASSED"
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
