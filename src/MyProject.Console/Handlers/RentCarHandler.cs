@@ -29,24 +29,41 @@ public class RentCarHandler
         System.Console.Write("\nEnter your name: ");
         var name = System.Console.ReadLine();
 
+        System.Console.Write("Enter customer type (economy/premium): ");
+        var customerType = System.Console.ReadLine()?.Trim().ToLower() ?? string.Empty;
+
         System.Console.Write("Enter car ID: ");
         var idInput = System.Console.ReadLine();
 
-        if (Guid.TryParse(idInput, out Guid carId))
+        System.Console.Write("Enter number of rental days: ");
+        var daysInput = System.Console.ReadLine();
+
+        if (!Guid.TryParse(idInput, out Guid carId))
         {
-            try
-            {
-                _service.RentCar(name!, carId);
-                System.Console.WriteLine("✅ Successfully rented!");
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"❌ Error: {ex.Message}");
-            }
+            System.Console.WriteLine(" Invalid ID format. Try copying a Guid from the list above.");
+            return;
         }
-        else
+
+        if (customerType is not "economy" and not "premium")
         {
-            System.Console.WriteLine("⚠️ Invalid ID format. Try copying a Guid from the list above.");
+            System.Console.WriteLine(" Invalid customer type. Use 'economy' or 'premium'.");
+            return;
+        }
+
+        if (!int.TryParse(daysInput, out var days) || days <= 0)
+        {
+            System.Console.WriteLine("Enter a valid number of days (1 or more).");
+            return;
+        }
+
+        try
+        {
+            _service.RentCar(name!, customerType, carId, days);
+            System.Console.WriteLine("Successfully rented!");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"Error: {ex.Message}");
         }
     }
 }

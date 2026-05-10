@@ -1,49 +1,68 @@
 ```mermaid
 classDiagram
-    class Car {
-        +Guid Id
-        +string Brand
-        +bool IsAvailable
-        +decimal DailyPrice
-    }
 
-    class Customer {
-        +Guid Id
-        +string Name
-        +GetDiscount() double
-    }
+class Car {
+    +Guid Id
+    +string Model
+    +decimal PricePerDay
+    +bool IsAvailable
+    +Rent()
+    +Return()
+}
 
-    class PremiumCustomer {
-        +double Discount
-        +GetDiscount() double
-    }
+class Customer {
+    +string Name
+    +GetDiscount() double
+}
 
-    class EconomyCustomer {
-        +int MaxRentals
-        +GetDiscount() double
-    }
+class PremiumCustomer
+class EconomyCustomer
 
-    class Rental {
-        +Guid Id
-        +DateTime RentDate
-        +DateTime ReturnDate
-        +CalculateTotal() decimal
-    }
+Customer <|-- PremiumCustomer
+Customer <|-- EconomyCustomer
 
-    class RentalService {
-        -ICarRepository _repository
-        +RentCar(string customerName, Guid carId) void
-    }
+class Rental {
+    +Guid Id
+    +DateTime RentedAt
+    +int Days
+    +decimal TotalPrice
+    +decimal LatePenalty
+    +CalculatePenalty()
+    +GetTotalCost()
+}
 
-    class ICarRepository {
-        <<interface>>
-        +Add(Car car) void
-        +GetById(Guid id) Car
-        +GetAll() List~Car~
-    }
+class RentalService {
+    +RentCar()
+    +ReturnCar()
+    +GetAvailableCars()
+}
 
-    Car <-- Rental
-    Customer <|-- PremiumCustomer
-    Customer <|-- EconomyCustomer
-    Rental --> Customer
-    RentalService --> ICarRepository
+class RentalFacade {
+    +Rent()
+    +Return()
+    +GetRevenue()
+    +GetTopCars()
+    +GetCars()
+}
+
+class ICarRepository {
+    <<interface>>
+    +Add(Car car)
+    +GetById(Guid id) Car
+    +GetAll() List~Car~
+    +Update(Car car)
+}
+
+class IRentalRepository {
+    <<interface>>
+    +Add(Rental rental)
+    +GetAll() List~Rental~
+}
+
+Car <-- Rental
+Customer <|-- PremiumCustomer
+Customer <|-- EconomyCustomer
+
+RentalService --> ICarRepository
+RentalService --> IRentalRepository
+RentalFacade --> RentalService

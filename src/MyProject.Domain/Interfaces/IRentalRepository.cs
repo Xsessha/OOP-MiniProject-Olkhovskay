@@ -2,8 +2,16 @@ using MyProject.Domain.Entities;
 
 namespace MyProject.Domain.Interfaces;
 
-public interface IRentalRepository
+public interface IRentalReadRepository
+{
+    List<Rental> GetAll();
+}
+
+public interface IRentalWriteRepository
 {
     void Add(Rental rental);
-    List<Rental> GetAll();
+}
+
+public interface IRentalRepository : IRentalReadRepository, IRentalWriteRepository
+{
 }

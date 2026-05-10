@@ -2,25 +2,76 @@ name: .NET CI
 
 on:
   push:
+    branches: [ dev, master ]
   pull_request:
+    branches: [ dev, master ]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 8.0.x
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
 
-    - name: Restore
-      run: dotnet restore
+      - name: Restore
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
 
-    - name: Test
-      run: dotnet test --no-build
+      - name: Test with coverage gate
+        run: >
+          dotnet test tests/MyProject.Tests/MyProject.Tests.csproj
+          --configuration Release
+          --no-restore
+          /p:CollectCoverage=true
+          /p:CoverletOutputFormat=opencover
+          /p:CoverletOutput=TestResults/coverage/
+          /p:Threshold=85
+          /p:ThresholdType=line
+          /p:ThresholdStat=total
+
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Add tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Generate report
+        run: |
+          reportgenerator \
+            -reports:"tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml" \
+            -targetdir:"coverage-report" \
+            -reporttypes:"Html"
+
+      - name: Branch coverage gate (80%)
+        run: |
+          FILE="tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml"
+
+          if [ ! -f "$FILE" ]; then
+            echo "coverage file not found"
+            exit 1
+          fi
+
+          BRANCH_COVERAGE=$(python3 -c "import sys, xml.etree.ElementTree as ET; root = ET.parse(sys.argv[1]).getroot(); bps = root.findall('.//BranchPoint'); total = len(bps); covered = sum(1 for bp in bps if int(bp.get('vc', '0')) > 0); print(100.0 if total == 0 else covered * 100 / total)" "$FILE")
+
+          echo "Branch coverage: $BRANCH_COVERAGE%"
+
+          python3 -c "import sys; coverage = float(sys.argv[1]); print('BRANCH COVERAGE GATE PASSED' if coverage >= 80 else 'BRANCH COVERAGE GATE FAILED'); sys.exit(0 if coverage >= 80 else 1)" "$BRANCH_COVERAGE"
+
+      - name: Verify HTML report
+        run: |
+          if [ ! -f coverage-report/index.html ]; then
+            echo "coverage-report/index.html not found"
+            exit 1
+          fi
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report

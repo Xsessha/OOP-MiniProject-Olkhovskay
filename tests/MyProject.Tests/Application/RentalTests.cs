@@ -9,7 +9,7 @@ public class RentalTests
         var car = new Car("BMW");
         var customer = new EconomyCustomer("John");
 
-        var rental = new Rental(car, customer);
+        var rental = new Rental(car, customer, 3);
 
         Assert.NotNull(rental);
     }
@@ -20,7 +20,7 @@ public class RentalTests
         var customer = new EconomyCustomer("John");
 
         Assert.Throws<ArgumentNullException>(() =>
-            new Rental(null!, customer));
+            new Rental(null!, customer, 1));
     }
 
     [Fact]
@@ -29,6 +29,6 @@ public class RentalTests
         var car = new Car("BMW");
 
         Assert.Throws<ArgumentNullException>(() =>
-            new Rental(car, null!));
+            new Rental(car, null!, 1));
     }
 }

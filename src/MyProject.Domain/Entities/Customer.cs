@@ -3,6 +3,7 @@ namespace MyProject.Domain.Entities;
 public abstract class Customer
 {
     public string Name { get; private set; }
+    public abstract string CustomerType { get; }
 
     protected Customer(string name)
     {
