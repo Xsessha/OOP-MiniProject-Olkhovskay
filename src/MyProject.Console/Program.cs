@@ -1,4 +1,6 @@
-﻿using MyProject.Domain.Entities;
+﻿using MyProject.Application.Events;
+using MyProject.Domain.Entities;
+using MyProject.Domain.Exceptions;
 using MyProject.Infrastructure.Persistence;
 using MyProject.Infrastructure.Repositories;
 using MyProject.Application.Services;
@@ -7,8 +9,17 @@ using MyProject.Application.Facades;
 var filePath = Path.GetFullPath(
     Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "cars.json"));
 
-var cars = File.Exists(filePath)
-    ? JsonDataStore<Car>.Load(filePath)
+ApplicationEventBus.Subscribe(new ConsoleLogger());
+
+var loadResult = JsonDataStore<Car>.LoadResult(filePath);
+
+if (!loadResult.Success)
+{
+    Console.WriteLine($"[WARNING] Could not load persisted car data: {loadResult.ErrorMessage}. Starting with default fleet.");
+}
+
+var cars = loadResult.Success
+    ? loadResult.Value!
     : new List<Car>
     {
         new Car("BMW X5"),
@@ -32,7 +43,13 @@ var cars = File.Exists(filePath)
     };
 
 if (!File.Exists(filePath))
-    JsonDataStore<Car>.Save(filePath, cars);
+{
+    var initSaveResult = JsonDataStore<Car>.Save(filePath, cars);
+    if (!initSaveResult.Success)
+    {
+        Console.WriteLine($"[ERROR] Could not persist initial fleet: {initSaveResult.ErrorMessage}");
+    }
+}
 
 var carRepo = new CarRepository(cars);
 var rentalRepo = new InMemoryRentalRepository();
@@ -73,10 +90,32 @@ while (true)
         Console.Write("Days: ");
         var days = int.Parse(Console.ReadLine()!);
 
-        facade.Rent(name!, type!, id, days);
-        JsonDataStore<Car>.Save(filePath, facade.GetCars());
+        try
+        {
+            var result = facade.Rent(name!, type!, id, days);
+            var saveResult = JsonDataStore<Car>.Save(filePath, facade.GetCars());
 
-        Console.WriteLine(" RENT SUCCESS");
+            if (!saveResult.Success)
+            {
+                Console.WriteLine($"[ERROR] Unable to persist rental state: {saveResult.ErrorMessage}");
+            }
+
+            Console.WriteLine($"Customer: {result.Rental.Customer.Name} ({result.CustomerType})");
+            Console.WriteLine($"Car: {result.Rental.Car.Model}");
+            Console.WriteLine($"Base price: {result.BasePrice:C2}");
+            Console.WriteLine($"Final price after discount: {result.DiscountedPrice:C2}");
+            Console.WriteLine("RENT SUCCESS");
+        }
+        catch (DomainException ex)
+        {
+            Console.WriteLine($"Operation failed: {ex.Message}");
+            ApplicationEventBus.Notify($"Business failure while renting: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            ApplicationEventBus.Notify($"Unexpected error while renting: {ex}");
+        }
     }
 
     if (option == "2")
@@ -84,26 +123,66 @@ while (true)
         Console.Write("Car ID: ");
         var id = Guid.Parse(Console.ReadLine()!);
 
-        facade.Return(id);
-        JsonDataStore<Car>.Save(filePath, facade.GetCars());
+        try
+        {
+            var result = facade.Return(id);
+            var saveResult = JsonDataStore<Car>.Save(filePath, facade.GetCars());
 
-        Console.WriteLine("RETURN SUCCESS");
+            if (!saveResult.Success)
+            {
+                Console.WriteLine($"[ERROR] Unable to persist return state: {saveResult.ErrorMessage}");
+            }
+
+            Console.WriteLine($"Car returned: {result.Rental.Car.Model}");
+
+            if (result.IsLate)
+            {
+                Console.WriteLine($"Late penalty: {result.Penalty:C2}");
+            }
+            else
+            {
+                Console.WriteLine("Returned on time. No penalty.");
+            }
+
+            Console.WriteLine($"Total cost: {result.TotalCost:C2}");
+        }
+        catch (DomainException ex)
+        {
+            Console.WriteLine($"Operation failed: {ex.Message}");
+            ApplicationEventBus.Notify($"Business failure while returning: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            ApplicationEventBus.Notify($"Unexpected error while returning: {ex}");
+        }
     }
 
     if (option == "3")
     {
+        Console.WriteLine("\nALL CARS:");
         PrintTable(facade.GetCars());
     }
 
     if (option == "4")
     {
-        Console.WriteLine("\nANALYTICS");
+        Console.WriteLine("\n=== ANALYTICS ===");
+        var revenue = facade.GetRevenue();
+        Console.WriteLine($"Total Revenue: {revenue:C2}");
 
-        Console.WriteLine($"Total revenue: {facade.GetRevenue():C2}");
-
-        Console.WriteLine("\nTop cars:");
-        foreach (var g in facade.GetTopCars())
-            Console.WriteLine($"{g.Key} -> {g.Count()} rentals");
+        var topCars = facade.GetTopCars().Take(5);
+        if (topCars.Any())
+        {
+            Console.WriteLine("\nTop 5 Most Rented Cars:");
+            foreach (var group in topCars)
+            {
+                Console.WriteLine($"{group.Key}: {group.Count()} rentals");
+            }
+        }
+        else
+        {
+            Console.WriteLine("\nNo rentals yet.");
+        }
     }
 }
 

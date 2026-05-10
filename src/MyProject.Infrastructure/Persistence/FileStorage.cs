@@ -1,4 +1,5 @@
 using System.Text.Json;
+using MyProject.Application.Events;
 using MyProject.Domain.Entities;
 
 namespace MyProject.Infrastructure.Persistence;
@@ -12,7 +13,6 @@ public class FileStorage : IDisposable
         _path = path;
     }
 
-    // 🔥 SAVE (JSON)
     public async Task SaveAsync(List<Car> cars)
     {
         if (_path is null)
@@ -23,10 +23,17 @@ public class FileStorage : IDisposable
             WriteIndented = true
         });
 
-        await File.WriteAllTextAsync(_path, json);
+        try
+        {
+            await File.WriteAllTextAsync(_path, json);
+        }
+        catch (IOException ex)
+        {
+            ApplicationEventBus.Notify($"I/O error while saving '{_path}': {ex.Message}");
+            throw;
+        }
     }
 
-    // 🔥 LOAD (JSON)
     public async Task<List<Car>> LoadAsync()
     {
         if (_path is null)
@@ -42,15 +49,19 @@ public class FileStorage : IDisposable
             return JsonSerializer.Deserialize<List<Car>>(json)
                    ?? new List<Car>();
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            // пошкоджений файл
+            ApplicationEventBus.Notify($"Corrupted JSON in '{_path}': {ex.Message}");
+            return new List<Car>();
+        }
+        catch (IOException ex)
+        {
+            ApplicationEventBus.Notify($"I/O error while loading '{_path}': {ex.Message}");
             return new List<Car>();
         }
     }
 
     public void Dispose()
     {
-        // зараз нічого не тримаєш відкритим довго
     }
 }

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using MyProject.Domain.Configuration;
 using MyProject.Domain.Exceptions;
 
 namespace MyProject.Domain.Entities;
@@ -47,28 +48,7 @@ public class Car
     }
 
     private static decimal GetDefaultPrice(string model)
-        => model switch
-        {
-            "BMW X5" => 120,
-            "Audi A6" => 110,
-            "Toyota Camry" => 70,
-            "Mercedes-Benz S-Class" => 200,
-            "Tesla Model 3" => 150,
-            "Honda Civic" => 65,
-            "Ford Mustang" => 130,
-            "Volkswagen Golf" => 75,
-            "Porsche 911" => 250,
-            "Nissan Rogue" => 80,
-            "Hyundai Tucson" => 72,
-            "Kia Sportage" => 68,
-            "Volvo XC90" => 90,
-            "Mazda CX-5" => 78,
-            "Subaru Outback" => 82,
-            "Lexus RX 350" => 140,
-            "Chevrolet Camaro" => 125,
-            "Jaguar F-Type" => 220,
-            _ => 60
-        };
+        => CarPricingConfiguration.GetPriceForModel(model);
 
     public void Rent()
     {

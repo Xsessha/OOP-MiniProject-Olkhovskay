@@ -1,3 +1,4 @@
+using System.Linq;
 using MyProject.Application.Factories;
 using MyProject.Domain.Entities;
 using MyProject.Domain.Exceptions;
@@ -7,81 +8,81 @@ namespace MyProject.Application.Services;
 
 public class RentalService
 {
-    private readonly ICarRepository _carRepository;
-    private readonly IRentalRepository _rentalRepository;
+    private readonly ICarReadRepository _carReadRepository;
+    private readonly ICarWriteRepository _carWriteRepository;
+    private readonly IRentalReadRepository _rentalReadRepository;
+    private readonly IRentalWriteRepository _rentalWriteRepository;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public RentalService(ICarRepository carRepository, IRentalRepository rentalRepository)
+    public RentalService(
+        ICarReadRepository carReadRepository,
+        ICarWriteRepository carWriteRepository,
+        IRentalReadRepository rentalReadRepository,
+        IRentalWriteRepository rentalWriteRepository,
+        IDateTimeProvider dateTimeProvider)
     {
-        _carRepository = carRepository;
-        _rentalRepository = rentalRepository;
+        _carReadRepository = carReadRepository;
+        _carWriteRepository = carWriteRepository;
+        _rentalReadRepository = rentalReadRepository;
+        _rentalWriteRepository = rentalWriteRepository;
+        _dateTimeProvider = dateTimeProvider;
     }
 
-    // ===================== USE CASE 1: RENT =====================
-    public Rental RentCar(string customerName, string customerType, Guid carId, int days)
+    public RentalService(ICarRepository carRepository, IRentalRepository rentalRepository)
+        : this(carRepository, carRepository, rentalRepository, rentalRepository, new SystemDateTimeProvider())
+    {
+    }
+
+    public RentalService(ICarRepository carRepository, IRentalRepository rentalRepository, IDateTimeProvider dateTimeProvider)
+        : this(carRepository, carRepository, rentalRepository, rentalRepository, dateTimeProvider)
+    {
+    }
+
+    public RentOperationResult RentCar(string customerName, string customerType, Guid carId, int days)
     {
         ValidateCustomerLimit(customerType, days);
 
-        var car = _carRepository.GetById(carId);
+        var car = _carReadRepository.GetById(carId);
 
         if (car == null)
             throw new CarNotFoundException(carId);
 
         car.Rent();
-        _carRepository.Update(car);
+        _carWriteRepository.Update(car);
 
         var customer = CustomerFactory.Create(customerName, customerType);
 
         var basePrice = car.PricePerDay * days;
-        var finalPrice = ApplyDiscount(basePrice, customerType);
+        var discountedPrice = ApplyDiscount(basePrice, customerType);
 
         var rental = new Rental(car, customer, days);
 
-        _rentalRepository.Add(rental);
+        _rentalWriteRepository.Add(rental);
 
-        Console.WriteLine($"Customer: {customer.Name} ({customerType})");
-        Console.WriteLine($"Car: {car.Model}");
-        Console.WriteLine($"Base price: {basePrice:C2}");
-        Console.WriteLine($"Final price after discount: {finalPrice:C2}");
-
-        return rental;
+        return new RentOperationResult(rental, basePrice, discountedPrice, customerType);
     }
 
-    // ===================== USE CASE 2: RETURN =====================
-    public void ReturnCar(Guid carId)
+    public ReturnOperationResult ReturnCar(Guid carId)
     {
-        var car = _carRepository.GetById(carId);
+        var car = _carReadRepository.GetById(carId);
 
         if (car == null)
-            throw new Exception("Car not found");
+            throw new CarNotFoundException(carId);
 
-        var rental = _rentalRepository.GetAll()
+        var rental = _rentalReadRepository.GetAll()
             .FirstOrDefault(r => r.Car.Id == carId);
 
         if (rental == null)
             throw new RentalNotFoundException(carId);
 
         car.Return();
-        _carRepository.Update(car);
+        _carWriteRepository.Update(car);
 
         var penalty = CalculatePenalty(rental);
 
-        Console.WriteLine($"Car returned: {car.Model}");
-
-        if (penalty > 0)
-        {
-            Console.WriteLine($"Late penalty: {penalty:C2}");
-        }
-        else
-        {
-            Console.WriteLine("Returned on time. No penalty.");
-        }
-
-        Console.WriteLine($"Total cost: {(rental.TotalPrice + penalty):C2}");
-
-        _rentalRepository.GetAll().Remove(rental);
+        return new ReturnOperationResult(rental, penalty);
     }
 
-    // ===================== USE CASE 3: RULES =====================
 
     private decimal ApplyDiscount(decimal price, string type)
     {
@@ -109,17 +110,17 @@ public class RentalService
     {
         var expected = rental.RentedAt.AddDays(rental.Days);
 
-        if (DateTime.Now <= expected)
+        if (_dateTimeProvider.Now <= expected)
             return 0;
 
-        var lateDays = (DateTime.Now - expected).Days;
+        var lateDays = (_dateTimeProvider.Now - expected).Days;
 
         return lateDays * rental.Car.PricePerDay * 1.5m;
     }
 
     public List<Car> GetAvailableCars()
     {
-        return _carRepository.GetAll()
+        return _carReadRepository.GetAll()
             .Where(c => c.IsAvailable)
             .ToList();
     }

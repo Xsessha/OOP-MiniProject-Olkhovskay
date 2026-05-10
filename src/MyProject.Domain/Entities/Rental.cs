@@ -18,6 +18,9 @@ public class Rental
         if (days <= 0)
             throw new ArgumentException("Days must be at least 1");
 
+        if (days > 365)
+            throw new ArgumentException("Days cannot exceed 365");
+
         Car = car;
         Customer = customer;
         Days = days;

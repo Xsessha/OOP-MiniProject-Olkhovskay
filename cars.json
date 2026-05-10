@@ -8,7 +8,7 @@
   {
     "Id": "83106c68-c72f-4f06-b739-d6531dd494ff",
     "Model": "Audi A6",
-    "IsAvailable": true,
+    "IsAvailable": false,
     "PricePerDay": 110
   },
   {

@@ -20,14 +20,14 @@ public class RentalFacade
         _rentalRepository = rentalRepository;
     }
 
-    public void Rent(string name, string type, Guid carId, int days)
+    public RentOperationResult Rent(string name, string type, Guid carId, int days)
     {
-        _service.RentCar(name, type, carId, days);
+        return _service.RentCar(name, type, carId, days);
     }
 
-    public void Return(Guid carId)
+    public ReturnOperationResult Return(Guid carId)
     {
-        _service.ReturnCar(carId);
+        return _service.ReturnCar(carId);
     }
 
     public List<Car> GetCars()

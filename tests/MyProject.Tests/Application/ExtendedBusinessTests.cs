@@ -18,7 +18,6 @@ public class ExtendedBusinessTests
         return new RentalService(carRepo, rentalRepo);
     }
 
-    // ===================== CAR RULES =====================
 
     [Fact]
     public void Car_Should_Always_Have_Positive_Price()
@@ -41,7 +40,6 @@ public class ExtendedBusinessTests
         Assert.True(car.IsAvailable);
     }
 
-    // ===================== RENTAL RULES =====================
 
     [Fact]
     public void Rental_Should_Calculate_TotalPrice()
@@ -80,7 +78,6 @@ public class ExtendedBusinessTests
         Assert.True(r2.TotalPrice > r1.TotalPrice);
     }
 
-    // ===================== SERVICE =====================
 
     [Fact]
     public void Service_Should_Prevent_Double_Rent()
@@ -119,7 +116,6 @@ public class ExtendedBusinessTests
             service.RentCar("User", "economy", Guid.NewGuid(), 1));
     }
 
-    // ===================== FACADE =====================
 
     [Fact]
     public void Facade_Should_Return_All_Cars()
@@ -166,7 +162,6 @@ public class ExtendedBusinessTests
         Assert.Equal(0, facade.GetRevenue());
     }
 
-    // ===================== COLLECTION RULES =====================
 
     [Fact]
     public void Cars_Should_Not_Overlap_Between_Instances()

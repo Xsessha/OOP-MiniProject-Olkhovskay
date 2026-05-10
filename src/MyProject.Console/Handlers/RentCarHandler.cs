@@ -40,13 +40,13 @@ public class RentCarHandler
 
         if (!Guid.TryParse(idInput, out Guid carId))
         {
-            System.Console.WriteLine("⚠️ Invalid ID format. Try copying a Guid from the list above.");
+            System.Console.WriteLine(" Invalid ID format. Try copying a Guid from the list above.");
             return;
         }
 
         if (customerType is not "economy" and not "premium")
         {
-            System.Console.WriteLine("⚠️ Invalid customer type. Use 'economy' or 'premium'.");
+            System.Console.WriteLine(" Invalid customer type. Use 'economy' or 'premium'.");
             return;
         }
 

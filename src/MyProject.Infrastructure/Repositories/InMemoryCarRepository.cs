@@ -5,7 +5,16 @@ namespace MyProject.Infrastructure.Repositories;
 
 public class InMemoryCarRepository : ICarRepository
 {
-    private readonly List<Car> _cars = new();
+    private List<Car> _cars = new();
+
+    public InMemoryCarRepository()
+    {
+    }
+
+    public InMemoryCarRepository(IEnumerable<Car> cars)
+    {
+        _cars = cars?.ToList() ?? new List<Car>();
+    }
 
     public void Add(Car car)
     {

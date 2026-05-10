@@ -2,13 +2,18 @@ using MyProject.Domain.Entities;
 
 namespace MyProject.Domain.Interfaces;
 
-public interface ICarRepository
+public interface ICarReadRepository
+{
+    Car? GetById(Guid id);
+    List<Car> GetAll();
+}
+
+public interface ICarWriteRepository
 {
     void Add(Car car);
-
-    Car? GetById(Guid id);
-
-    List<Car> GetAll();
-
     void Update(Car car);
+}
+
+public interface ICarRepository : ICarReadRepository, ICarWriteRepository
+{
 }
