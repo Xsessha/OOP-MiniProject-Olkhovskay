@@ -1,3 +1,15 @@
 [Bb]in/
 [Oo]bj/
 *.cache
+
+# Local runtime data
+cars.json
+
+# Test and coverage outputs
+coverage-report/
+**/TestResults/
+**/coverage.opencover.xml
+**/coverage.cobertura.xml
+**/coverage.json
+*.coverage
+*.coveragexml
