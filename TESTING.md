@@ -1,97 +1,82 @@
-# TESTING.md
+# Testing
 
-## Як запускати тести
+## Команди
 
 Запуск усіх тестів:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj
+dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release
 ```
 
-Запуск у Release, як у CI:
-
-```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release --no-restore
-```
-
-Запуск з coverage gate 85% для line coverage:
+Coverage з line threshold 85%:
 
 ```bash
 dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
 ```
 
-Генерація HTML-звіту:
+HTML-звіт:
 
 ```bash
 reportgenerator -reports:tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml -targetdir:coverage-report -reporttypes:Html
 ```
 
-Результат відкривається у:
+## Поточний результат
+
+Останній локальний прогін: 2026-05-19.
 
 ```text
-coverage-report/index.html
+Passed: 217
+Failed: 0
+Skipped: 0
 ```
 
-## Що покрито тестами
+Загальний результат проекту (Total)
+- Тести перевіряють 91.34% від усіх рядків коду в проекті.
+- Тести проходять через 87.50% усіх можливих варіантів розвитку подій (розгалужень) у коді.
+- Загалом у проекті протестовано 91.97% усіх написаних методів (функцій).
 
-Unit tests покривають:
+1. 
+- Модуль MyProject.Domain (Доменна логіка)
+Тести покривають 95.96% рядків коду цього модуля.
+- Протестовано 96.66% усіх умов та логічних розгалужень.
+- Тести викликають і перевіряють 93.87% методів.
+- Це найкращий показник у всьому проекті.
+
+2. 
+- Модуль MyProject.Application (Прикладний шар)
+Тести покривають 90.58% рядків коду.
+Логічні розгалуження та умови перевірені на 86.84%.
+- Тестами охоплено 87.93% усіх методів.
+
+3. 
+- Модуль MyProject.Infrastructure (Інфраструктура)
+Тести покривають 86.86% рядків коду.
+- Логічні розгалуження та перевірки умов виконані на 78.57%.
+- Тести успішно викликають 96.66% усіх методів цього модуля.
+## Що покрито
 
 - доменні інваріанти `Car`, `Rental`, `Customer`, `Money`;
-- boundary values для днів оренди, цін і порожніх значень;
-- `RentalService` і domain exceptions;
-- `CustomerFactory` як точку розширення створення клієнтів;
-- `RentalFacade`;
-- `RentalAnalyticsService`;
-- `Result` / `Result<T>`;
-- event listeners і event bus;
-- `FileStorage`, `JsonService`, `JsonDataStore<T>`.
+- бізнес-сценарії оренди та повернення;
+- винятки `CarNotFoundException`, `CarAlreadyRentedException`, `RentalNotFoundException`, `InvalidCustomerTypeException`, `RentalLimitExceededException`;
+- pricing behavior для economy/premium клієнтів;
+- `RentalService`, `RentalFacade`, `RentalAnalyticsService`;
+- repositories та persistence;
+- JSON load/save, corrupted JSON, missing file, invalid path;
+- event bus та listeners;
+- `Result` / `Result<T>`.
 
-Integration tests покривають:
+## CI
 
-- створення даних;
-- збереження в тимчасовий JSON-файл;
-- повторне завантаження;
-- оренду після відновлення стану;
-- повернення після відновлення стану;
-- кілька послідовних операцій;
-- missing file;
-- corrupted JSON;
-- invalid save path;
-- логування persistence errors.
+Workflow: `.github/workflows/dotnet.yml`.
 
-Fault handling tests покривають:
-
-- `CarNotFoundException`;
-- `CarAlreadyRentedException`;
-- `RentalNotFoundException`;
-- `InvalidCustomerTypeException`;
-- `RentalLimitExceededException`;
-- `ArgumentException` для невалідних доменних значень;
-- `Result.Fail` для persistence failures;
-- graceful fallback для missing/corrupted files.
-
-## Поточні метрики
-
-Останній перевірений запуск:
-
-- 212 xUnit test cases passed;
-- 168 unit test methods;
-- 25 integration test methods;
-- line coverage: 89.87%;
-- branch coverage: 88.04%;
-- method coverage: 88.88%;
-- 0 класів з 0% executable line coverage.
-
-## CI quality gate
-
-Workflow `.github/workflows/dotnet.yml` виконує:
+CI виконує:
 
 - `dotnet restore`;
 - `dotnet build --configuration Release`;
 - `dotnet test` з coverlet;
-- line coverage threshold 85%;
-- branch coverage threshold 80%;
-- HTML report generation;
-- перевірку наявності `coverage-report/index.html`;
+- line coverage gate 85%;
+- branch coverage gate 80%;
+- генерацію HTML coverage report;
 - upload `coverage-report` artifact.
 
+Локальний еквівалент CI перевірено: build succeeded, tests passed, coverage threshold passed.

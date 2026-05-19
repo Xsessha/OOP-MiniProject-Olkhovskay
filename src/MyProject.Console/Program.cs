@@ -84,11 +84,11 @@ while (true)
         Console.Write("Type (economy/premium): ");
         var type = Console.ReadLine();
 
-        Console.Write("Car ID: ");
-        var id = Guid.Parse(Console.ReadLine()!);
+        if (!TryReadGuid("Car ID", out var id))
+            continue;
 
-        Console.Write("Days: ");
-        var days = int.Parse(Console.ReadLine()!);
+        if (!TryReadPositiveInt("Days", out var days))
+            continue;
 
         try
         {
@@ -120,8 +120,8 @@ while (true)
 
     if (option == "2")
     {
-        Console.Write("Car ID: ");
-        var id = Guid.Parse(Console.ReadLine()!);
+        if (!TryReadGuid("Car ID", out var id))
+            continue;
 
         try
         {
@@ -198,4 +198,30 @@ void PrintTable(List<Car> cars)
     }
 
     Console.WriteLine("--------------------------------------------------------------------------------");
+}
+
+bool TryReadGuid(string label, out Guid value)
+{
+    Console.Write($"{label}: ");
+    var input = Console.ReadLine();
+
+    if (Guid.TryParse(input, out value))
+        return true;
+
+    Console.WriteLine($"{label} must be a valid GUID.");
+    value = Guid.Empty;
+    return false;
+}
+
+bool TryReadPositiveInt(string label, out int value)
+{
+    Console.Write($"{label}: ");
+    var input = Console.ReadLine();
+
+    if (int.TryParse(input, out value) && value > 0)
+        return true;
+
+    Console.WriteLine($"{label} must be a positive number.");
+    value = 0;
+    return false;
 }

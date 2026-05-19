@@ -3,6 +3,9 @@ using MyProject.Domain.Interfaces;
 
 namespace MyProject.Application.Analytics;
 
+/// <summary>
+/// Provides read-only analytical queries over cars and rentals.
+/// </summary>
 public class RentalAnalyticsService
 {
     private readonly IRentalRepository _rentalRepository;
@@ -14,6 +17,9 @@ public class RentalAnalyticsService
         _carRepository = carRepository;
     }
 
+    /// <summary>
+    /// Returns rentals whose cars are still marked as unavailable.
+    /// </summary>
     public List<Rental> GetActiveRentals()
     {
         return _rentalRepository.GetAll()
@@ -21,13 +27,19 @@ public class RentalAnalyticsService
             .ToList();
     }
 
+    /// <summary>
+    /// Finds rentals by customer name using case-insensitive substring matching.
+    /// </summary>
     public List<Rental> SearchByCustomer(string name)
     {
         return _rentalRepository.GetAll()
-            .Where(r => r.Customer.Name.ToLower().Contains(name.ToLower()))
+            .Where(r => r.Customer.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
 
+    /// <summary>
+    /// Returns up to five cars ordered by number of rentals.
+    /// </summary>
     public List<Car> GetTopRentedCars()
     {
         return _rentalRepository.GetAll()
@@ -38,6 +50,9 @@ public class RentalAnalyticsService
             .ToList();
     }
 
+    /// <summary>
+    /// Returns all cars ordered from the most expensive to the cheapest.
+    /// </summary>
     public List<Car> GetCarsSortedByPrice()
     {
         return _carRepository.GetAll()
@@ -45,6 +60,9 @@ public class RentalAnalyticsService
             .ToList();
     }
 
+    /// <summary>
+    /// Counts how many rentals each car model has.
+    /// </summary>
     public Dictionary<string, int> GetCarPopularity()
     {
         var dict = new Dictionary<string, int>();
@@ -60,6 +78,9 @@ public class RentalAnalyticsService
         return dict;
     }
 
+    /// <summary>
+    /// Returns unique customer names with O(1) average membership checks.
+    /// </summary>
     public HashSet<string> GetUniqueCustomers()
     {
         return _rentalRepository.GetAll()
@@ -67,6 +88,9 @@ public class RentalAnalyticsService
             .ToHashSet();
     }
 
+    /// <summary>
+    /// Aggregates revenue across all recorded rentals.
+    /// </summary>
     public decimal GetTotalRevenue()
     {
         return _rentalRepository.GetAll()
