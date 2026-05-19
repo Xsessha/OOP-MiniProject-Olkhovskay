@@ -6,6 +6,9 @@ using MyProject.Domain.Interfaces;
 
 namespace MyProject.Application.Services;
 
+/// <summary>
+/// Coordinates the main rental use cases and keeps domain rules outside the console UI.
+/// </summary>
 public class RentalService
 {
     private readonly ICarReadRepository _carReadRepository;
@@ -38,9 +41,14 @@ public class RentalService
     {
     }
 
+    /// <summary>
+    /// Rents an available car to a customer and returns the calculated pricing details.
+    /// </summary>
     public RentOperationResult RentCar(string customerName, string customerType, Guid carId, int days)
     {
-        ValidateCustomerLimit(customerType, days);
+        var normalizedCustomerType = NormalizeCustomerType(customerType);
+        ValidateRentalDays(days);
+        ValidateCustomerLimit(normalizedCustomerType, days);
 
         var car = _carReadRepository.GetById(carId);
 
@@ -50,18 +58,21 @@ public class RentalService
         car.Rent();
         _carWriteRepository.Update(car);
 
-        var customer = CustomerFactory.Create(customerName, customerType);
+        var customer = CustomerFactory.Create(customerName, normalizedCustomerType);
 
         var basePrice = car.PricePerDay * days;
-        var discountedPrice = ApplyDiscount(basePrice, customerType);
+        var discountedPrice = ApplyCustomerDiscount(basePrice, customer);
 
         var rental = new Rental(car, customer, days);
 
         _rentalWriteRepository.Add(rental);
 
-        return new RentOperationResult(rental, basePrice, discountedPrice, customerType);
+        return new RentOperationResult(rental, basePrice, discountedPrice, normalizedCustomerType);
     }
 
+    /// <summary>
+    /// Returns a rented car and calculates a late-return penalty when needed.
+    /// </summary>
     public ReturnOperationResult ReturnCar(Guid carId)
     {
         var car = _carReadRepository.GetById(carId);
@@ -83,18 +94,28 @@ public class RentalService
         return new ReturnOperationResult(rental, penalty);
     }
 
-
-    private decimal ApplyDiscount(decimal price, string type)
+    private static decimal ApplyCustomerDiscount(decimal price, Customer customer)
     {
-        return type switch
-        {
-            "premium" => price * 0.8m,
-            "economy" => price,
-            _ => price
-        };
+        return price * (1 - customer.GetDiscount());
     }
 
-    private void ValidateCustomerLimit(string type, int days)
+    private static string NormalizeCustomerType(string type)
+    {
+        return string.IsNullOrWhiteSpace(type)
+            ? string.Empty
+            : type.Trim().ToLowerInvariant();
+    }
+
+    private static void ValidateRentalDays(int days)
+    {
+        if (days <= 0)
+            throw new ArgumentException("Days must be at least 1", nameof(days));
+
+        if (days > 365)
+            throw new ArgumentException("Days cannot exceed 365", nameof(days));
+    }
+
+    private static void ValidateCustomerLimit(string type, int days)
     {
         if (type != "economy" && type != "premium")
             throw new InvalidCustomerTypeException(type);
@@ -118,6 +139,9 @@ public class RentalService
         return lateDays * rental.Car.PricePerDay * 1.5m;
     }
 
+    /// <summary>
+    /// Returns cars that can currently be rented.
+    /// </summary>
     public List<Car> GetAvailableCars()
     {
         return _carReadRepository.GetAll()

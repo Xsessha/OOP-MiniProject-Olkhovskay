@@ -80,4 +80,47 @@ public class RentalServiceTests
         Assert.Throws<CarNotFoundException>(() =>
             service.RentCar("User", "economy", Guid.NewGuid(), 3));
     }
+
+    [Fact]
+    public void Should_Use_Customer_Discount_For_Discounted_Price()
+    {
+        var service = CreateService(out var repo);
+        var car = new Car("BMW", 100);
+        repo.Add(car);
+
+        var result = service.RentCar("User", "economy", car.Id, 3);
+
+        Assert.Equal(300, result.BasePrice);
+        Assert.Equal(285, result.DiscountedPrice);
+        Assert.Equal(result.Rental.TotalPrice, result.DiscountedPrice);
+    }
+
+    [Fact]
+    public void Should_Accept_Customer_Type_Case_Insensitively()
+    {
+        var service = CreateService(out var repo);
+        var car = new Car("BMW", 100);
+        repo.Add(car);
+
+        var result = service.RentCar("User", " Premium ", car.Id, 2);
+
+        Assert.Equal("premium", result.CustomerType);
+        Assert.Equal(160, result.DiscountedPrice);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(366)]
+    public void Should_Not_Mutate_Car_When_Rental_Days_Are_Invalid(int days)
+    {
+        var service = CreateService(out var repo);
+        var car = new Car("BMW", 100);
+        repo.Add(car);
+
+        Assert.Throws<ArgumentException>(() =>
+            service.RentCar("User", "economy", car.Id, days));
+
+        Assert.True(car.IsAvailable);
+    }
 }

@@ -1,68 +1,94 @@
+# Class Diagram
+
 ```mermaid
 classDiagram
+    class Car {
+        +Guid Id
+        +string Model
+        +bool IsAvailable
+        +decimal PricePerDay
+        +Rent()
+        +Return()
+    }
 
-class Car {
-    +Guid Id
-    +string Model
-    +decimal PricePerDay
-    +bool IsAvailable
-    +Rent()
-    +Return()
-}
+    class Customer {
+        <<abstract>>
+        +string Name
+        +string CustomerType
+        +GetDiscount() decimal
+    }
 
-class Customer {
-    +string Name
-    +GetDiscount() double
-}
+    class EconomyCustomer {
+        +GetDiscount() decimal
+    }
 
-class PremiumCustomer
-class EconomyCustomer
+    class PremiumCustomer {
+        +GetDiscount() decimal
+    }
 
-Customer <|-- PremiumCustomer
-Customer <|-- EconomyCustomer
+    class Rental {
+        +Car Car
+        +Customer Customer
+        +int Days
+        +decimal TotalPrice
+        +DateTime RentedAt
+        +decimal LatePenalty
+        +CalculatePenalty()
+        +GetTotalCost() decimal
+    }
 
-class Rental {
-    +Guid Id
-    +DateTime RentedAt
-    +int Days
-    +decimal TotalPrice
-    +decimal LatePenalty
-    +CalculatePenalty()
-    +GetTotalCost()
-}
+    class RentalService {
+        +RentCar(string, string, Guid, int) RentOperationResult
+        +ReturnCar(Guid) ReturnOperationResult
+        +GetAvailableCars() List~Car~
+    }
 
-class RentalService {
-    +RentCar()
-    +ReturnCar()
-    +GetAvailableCars()
-}
+    class RentalFacade {
+        +Rent(string, string, Guid, int) RentOperationResult
+        +Return(Guid) ReturnOperationResult
+        +GetCars() List~Car~
+        +GetAvailableCars() List~Car~
+        +GetRevenue() decimal
+        +GetTopCars() IEnumerable
+    }
 
-class RentalFacade {
-    +Rent()
-    +Return()
-    +GetRevenue()
-    +GetTopCars()
-    +GetCars()
-}
+    class RentalAnalyticsService {
+        +GetActiveRentals() List~Rental~
+        +SearchByCustomer(string) List~Rental~
+        +GetTopRentedCars() List~Car~
+        +GetCarPopularity() Dictionary
+        +GetUniqueCustomers() HashSet
+        +GetTotalRevenue() decimal
+    }
 
-class ICarRepository {
-    <<interface>>
-    +Add(Car car)
-    +GetById(Guid id) Car
-    +GetAll() List~Car~
-    +Update(Car car)
-}
+    class ICarRepository {
+        <<interface>>
+        +GetById(Guid) Car
+        +GetAll() List~Car~
+        +Add(Car)
+        +Update(Car)
+    }
 
-class IRentalRepository {
-    <<interface>>
-    +Add(Rental rental)
-    +GetAll() List~Rental~
-}
+    class IRentalRepository {
+        <<interface>>
+        +GetAll() List~Rental~
+        +Add(Rental)
+    }
 
-Car <-- Rental
-Customer <|-- PremiumCustomer
-Customer <|-- EconomyCustomer
+    class JsonDataStore~T~ {
+        +Save(string, IEnumerable~T~) Result
+        +Load(string) List~T~
+        +LoadResult(string) ResultOfList
+    }
 
-RentalService --> ICarRepository
-RentalService --> IRentalRepository
-RentalFacade --> RentalService
+    Customer <|-- EconomyCustomer
+    Customer <|-- PremiumCustomer
+    Car <-- Rental
+    Customer <-- Rental
+    RentalService --> ICarRepository
+    RentalService --> IRentalRepository
+    RentalFacade --> RentalService
+    RentalAnalyticsService --> ICarRepository
+    RentalAnalyticsService --> IRentalRepository
+    JsonDataStore ..> Car
+```

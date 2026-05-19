@@ -1,22 +1,24 @@
+# Facade Architecture Diagram
+
 ```mermaid
-classDiagram
+flowchart LR
+    Console[Console UI]
+    Facade[RentalFacade]
+    Service[RentalService]
+    Analytics[RentalAnalyticsService]
+    CarRepo[ICarRepository]
+    RentalRepo[IRentalRepository]
+    Domain[Domain Entities]
+    Json[JsonDataStore]
 
-class Console {
-    +Menu()
-}
-
-class RentalFacade {
-    +Rent()
-    +Return()
-    +GetCars()
-    +GetAnalytics()
-}
-
-class RentalService
-class CarRepository
-class RentalRepository
-
-Console --> RentalFacade
-RentalFacade --> RentalService
-RentalFacade --> CarRepository
-RentalFacade --> RentalRepository
+    Console --> Facade
+    Console --> Json
+    Facade --> Service
+    Facade --> CarRepo
+    Facade --> RentalRepo
+    Analytics --> CarRepo
+    Analytics --> RentalRepo
+    Service --> CarRepo
+    Service --> RentalRepo
+    Service --> Domain
+```

@@ -18,7 +18,6 @@
 - перевірка бізнес-правил (оренда/повернення)
 - тестування persistence шару
 
-
 ## Iteration 4
 - розширення бізнес-сценаріїв (return + penalty system)
 - застосування Factory (Customer creation)
