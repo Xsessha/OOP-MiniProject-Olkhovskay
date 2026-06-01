@@ -7,7 +7,7 @@ Car Rent System допомагає вести простий автопарк: �
 ## Запуск
 
 ```bash
-dotnet run --project src/MyProject.Console/MyProject.Console.csproj
+dotnet run --project src/CarRentSystemstem.Console/CarRentSystem.Console.csproj
 ```
 
 Після запуску з'явиться меню:

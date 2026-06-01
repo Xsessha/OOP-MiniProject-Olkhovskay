@@ -74,8 +74,8 @@
 
 ## Release checklist
 
-- [x] `dotnet build MyProject.sln --configuration Release`
-- [x] `dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release`
+- [x] `dotnet build CarRentSystemstem.sln --configuration Release`
+- [x] `dotnet test tests/CarRentSystemstem.Tests/CarRentSystem.Tests.csproj --configuration Release`
 - [x] coverage threshold 85% line пройдено
 - [x] branch coverage вище 80%
 - [x] README посилається на решту документації

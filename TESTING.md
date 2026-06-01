@@ -5,19 +5,19 @@
 Запуск усіх тестів:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release
+dotnet test tests/CarRentSystemstem.TeCarRCarRentSystemject.Tests.csproj --configuration Release
 ```
 
 Coverage з line threshold 85%:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
+dotnet test tests/CarRentSystemstem.Tests/CarRentSystem.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
 ```
 
 HTML-звіт:
 
 ```bash
-reportgenerator -reports:tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml -targetdir:coverage-report -reporttypes:Html
+reportgenerator -reports:tests/CarRentSystem.Tests/TestResults/coverage/coverage.opencover.xml -targetdir:coverage-report -reporttypes:Html
 ```
 
 ## Поточний результат
@@ -36,20 +36,20 @@ Skipped: 0
 - Загалом у проекті протестовано 91.97% усіх написаних методів (функцій).
 
 1. 
-- Модуль MyProject.Domain (Доменна логіка)
+- Модуль CarRentSystem.Domain (Доменна логіка)
 Тести покривають 95.96% рядків коду цього модуля.
 - Протестовано 96.66% усіх умов та логічних розгалужень.
 - Тести викликають і перевіряють 93.87% методів.
 - Це найкращий показник у всьому проекті.
 
 2. 
-- Модуль MyProject.Application (Прикладний шар)
+- Модуль CarRentSystem.Application (Прикладний шар)
 Тести покривають 90.58% рядків коду.
 Логічні розгалуження та умови перевірені на 86.84%.
 - Тестами охоплено 87.93% усіх методів.
 
 3. 
-- Модуль MyProject.Infrastructure (Інфраструктура)
+- Модуль CarRentSystem.Infrastructure (Інфраструктура)
 Тести покривають 86.86% рядків коду.
 - Логічні розгалуження та перевірки умов виконані на 78.57%.
 - Тести успішно викликають 96.66% усіх методів цього модуля.

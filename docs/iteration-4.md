@@ -17,8 +17,8 @@
 
 ## Перевірка
 
-- `dotnet build MyProject.sln --configuration Release` - success, 0 warnings, 0 errors.
-- `dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release` - 217 passed.
+- `dotnet build CarRentSystemstem.sln --configuration Release` - success, 0 warnings, 0 errors.
+- `dotnet test tests/CarRentSystem.Tests/CarRentSystem.Tests.csproj --configuration Release` - 217 passed.
 - Coverage: 91.34% line, 87.50% branch, 91.97% method.
 
 ## Висновок

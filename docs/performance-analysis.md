@@ -9,6 +9,8 @@
 - `RentalAnalyticsService.GetCarPopularity()`;
 - `RentalAnalyticsService.GetUniqueCustomers()`;
 - `RentalAnalyticsService.GetTotalRevenue()`;
+- `RentalAnalyticsService.GetRentalReport(RentalQuery?)`;
+- `RentalAnalyticsService.GetCachedRentalReport(RentalQuery?)`;
 - `RentalFacade.GetTopCars()`.
 
 Це доречний сценарій для аналізу, бо він читає всі оренди, групує дані та готує підсумки для demo/defense.
@@ -21,6 +23,7 @@
 | `List<Rental>` | `InMemoryRentalRepository` | Послідовна історія оренд, проста агрегація |
 | `Dictionary<string, int>` | `GetCarPopularity()` | O(1) average update для лічильника моделі |
 | `HashSet<string>` | `GetUniqueCustomers()` | Автоматичне усунення дублікатів, O(1) average lookup |
+| `QueryCache<TKey, TValue>` | `GetCachedRentalReport()` | Повторний доступ до звіту за ключем query у середньому O(1) |
 | LINQ `GroupBy`, `Sum`, `Where` | facade та analytics | Читабельні декларативні запити для малого набору |
 
 ## Мікроаналіз складності
@@ -35,6 +38,7 @@
 | Популярність моделей через `Dictionary` | O(n) average | Один прохід, оновлення лічильника |
 | Унікальні клієнти через `HashSet` | O(n) average | Один прохід, без додаткової ручної перевірки |
 | Топ моделей через `GroupBy` + sort | O(n + k log k) | `k` - кількість різних моделей |
+| Повторний cached report | O(1) average | Після першої побудови звіт береться з `Dictionary` |
 
 ## Що оптимізовано
 
@@ -42,6 +46,7 @@
 - У `SearchByCustomer` замінено `ToLower().Contains(...)` на `Contains(..., StringComparison.OrdinalIgnoreCase)`, щоб не створювати проміжні lowercase strings.
 - Для унікальних клієнтів використано `HashSet`, а не ручну перевірку `List.Contains`.
 - Для популярності моделей лишено `Dictionary`, бо це найпростіший і доречний лічильник.
+- Для повторюваного demo/dashboard-звіту додано `QueryCache<TKey, TValue>`.
 
 ## Чи потрібні додаткові зміни
 
@@ -51,5 +56,5 @@
 
 - індекс `Dictionary<Guid, Car>` у repository для O(1) пошуку авто;
 - database queries замість in-memory LINQ;
-- cache для топ моделей;
+- cache eviction/versioning для довгоживучого застосунку;
 - pagination для великих списків авто.

@@ -54,7 +54,7 @@ Quality gate, автоматизоване тестування, fault handling 
 Останній локальний запуск:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
+dotnet test tests/CarRentSystemstem.TeCarRCarRentSystemject.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
 ```
 
 Результат:
@@ -74,9 +74,9 @@ dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release
 
 | Module | Line | Branch | Method |
 | --- | ---: | ---: | ---: |
-| MyProject.Application | 87.03% | 88.23% | 80.35% |
-| MyProject.Domain | 95.96% | 96.66% | 93.87% |
-| MyProject.Infrastructure | 86.86% | 78.57% | 96.66% |
+| CarRentSystem.Application | 87.03% | 88.23% | 80.35% |
+| CarRentSystem.Domain | 95.96% | 96.66% | 93.87% |
+| CarRentSystemstem.Infrastructure | 86.86% | 78.57% | 96.66% |
 | Total | 89.87% | 88.04% | 88.88% |
 
 HTML-звіт: `coverage-report/index.html`.

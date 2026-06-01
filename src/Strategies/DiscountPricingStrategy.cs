@@ -1,4 +1,4 @@
-namespace MyProject.Domain.Strategies;
+namespace CarRentSystem.Domain.Strategies;
 
 public class DiscountPricingStrategy : IPricingStrategy
 {

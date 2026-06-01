@@ -1,6 +1,6 @@
 # Test Matrix для Lab 36
 
-Цей документ показує відповідність між use cases, ризиками та тестами. Назви тестів наведені за поточним кодом у `tests/MyProject.Tests`.
+Цей документ показує відповідність між use cases, ризиками та тестами. Назви тестів наведені за поточним кодом у `tests/CarRentSystemstem.Tests`.
 
 ## Покриття use cases
 
@@ -16,7 +16,7 @@
 | UC-8. Ціна моделі авто | старий hotspot у `Car.GetDefaultPrice()` | `ExtendedDomainTests.CarPricingConfiguration_Should_Get_BMW_X5_Price`, `ExtendedDomainTests.CarPricingConfiguration_Should_Get_Default_Price_For_Unknown_Model`, `ExtendedDomainTests.CarPricingConfiguration_All_Models_Should_Have_Valid_Prices` |
 | UC-9. Money value object | від'ємні суми, неправильні порівняння | `MoneyTests.Constructor_Should_Reject_Negative_Amount`, `MoneyTests.Addition_Should_Return_New_Money_With_Summed_Amount`, `MoneyTests.GreaterThan_Should_Compare_Amounts`, `MoneyTests.LessThan_Should_Compare_Amounts` |
 | UC-10. Facade для сценаріїв застосунку | UI/console залежить від внутрішніх деталей | `FacadeTests.Facade_Should_Rent_Car`, `FacadeTests.Facade_Should_Return_Car`, `FacadeTests.Facade_Should_Calculate_Revenue_After_Rental` |
-| UC-11. Аналітика оренд | LINQ падає на порожніх даних або рахує неправильно | `RentalAnalyticsServiceTests.GetTotalRevenue_Should_Return_Zero_For_No_Rentals`, `RentalAnalyticsServiceTests.GetCarPopularity_Should_Count_Rentals_Per_Model`, `RentalAnalyticsServiceTests.GetTopRentedCars_Should_Order_By_Rental_Count_And_Limit_To_Five` |
+| UC-11. Аналітика оренд | LINQ падає на порожніх даних або рахує неправильно | `RentalAnalyticsServiceTests.GetTotalRevenue_Should_Return_Zero_For_No_Rentals`, `RentalAnalyticsServiceTests.GetCarPopularity_Should_Count_Rentals_Per_Model`, `RentalAnalyticsServiceTests.GetTopRentedCars_Should_Order_By_Rental_Count_And_Limit_To_Five`, `RentalAnalyticsServiceTests.GetRentalReport_Should_Use_Filter_And_Linq_Aggregations`, `RentalAnalyticsServiceTests.GetCachedRentalReport_Should_Reuse_Report_Until_Cache_Is_Cleared` |
 | UC-12. Пошук клієнта | case-sensitive або неправильна фільтрація | `RentalAnalyticsServiceTests.SearchByCustomer_Should_Search_Case_Insensitively` |
 | UC-13. Збереження у файл | дані не записуються або втрачаються | `PersistenceIntegrationTests.Save_And_Load_Should_Preserve_Data`, `FileStorageTests.SaveAsync_And_LoadAsync_Should_RoundTrip_Cars`, `JsonDataStoreResultTests.Save_Should_Write_File_And_Return_Success` |
 | UC-14. Повторне завантаження | стан після restore неправильний | `PersistenceIntegrationTests.Loaded_Car_Should_Keep_Model`, `RentalSystemIntegrationTests.Should_Rent_After_Reload`, `RentalSystemIntegrationTests.Full_System_Flow_Should_Work` |
@@ -30,8 +30,8 @@
 
 | Вимога | Статус | Доказ |
 | --- | --- | --- |
-| Мінімум 20 unit-тестів | Виконано | 168 unit test methods, 212 xUnit cases total |
-| Мінімум 8 integration-тестів | Виконано | 25 integration test methods у `tests/MyProject.Tests/Integration` |
+| Мінімум 20 unit-тестів | Виконано | Понад 160 unit test methods, 220 xUnit cases total |
+| Мінімум 8 integration-тестів | Виконано | 25 integration test methods у `tests/CarRentSystemstem.Tests/Integration` |
 | Негативні сценарії | Виконано | invalid car, duplicate rent, invalid customer, corrupted JSON, missing file, invalid path |
 | Theory tests | Виконано | `TheoryTests`, `MoneyTests`, `RentalAnalyticsServiceTests`, `ResultTests`, `EventListenerTests` |
 | Builders/fixtures | Виконано | `TestDataFixture`, `TestPathHelper`, in-memory repositories |

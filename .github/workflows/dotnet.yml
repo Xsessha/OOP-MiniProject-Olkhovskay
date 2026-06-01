@@ -24,7 +24,7 @@ jobs:
 
       - name: Test with coverage gate
         run: >
-          dotnet test tests/MyProject.Tests/MyProject.Tests.csproj
+          dotnet test tests/CarRentSystem.Tests/CarRentSystem.Tests.csproj
           --configuration Release
           --no-restore
           /p:CollectCoverage=true
@@ -43,13 +43,13 @@ jobs:
       - name: Generate report
         run: |
           reportgenerator \
-            -reports:"tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml" \
+            -reports:"tests/CarRentSystem.Tests/TestResults/coverage/coverage.opencover.xml" \
             -targetdir:"coverage-report" \
             -reporttypes:"Html"
 
       - name: Branch coverage gate (80%)
         run: |
-          FILE="tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml"
+          FILE="tests/CarRentSystem.Tests/TestResults/coverage/coverage.opencover.xml"
 
           if [ ! -f "$FILE" ]; then
             echo "coverage file not found"

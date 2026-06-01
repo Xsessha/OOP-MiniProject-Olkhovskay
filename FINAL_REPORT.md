@@ -14,6 +14,8 @@
 - розрахунок знижки та штрафу;
 - збереження стану в JSON;
 - аналітика доходу та популярності моделей;
+- delegate pipeline для фільтрації оренд;
+- кешований LINQ-звіт для демо та аналітичних запитів;
 - автоматизовані unit/integration tests;
 - CI workflow з coverage gates.
 
@@ -41,6 +43,22 @@
 - console UI більше не падає на некоректному GUID або кількості днів;
 - `RentalService` валідовує діапазон днів до зміни стану автомобіля.
 
+## Самостійна робота №29
+
+Після аудиту покриття курсу добудовано три залежні розширення:
+
+- `RentalQuery` - delegate/lambda pipeline для складання фільтрів оренд;
+- `RentalAnalyticsReport` - розширений LINQ-звіт над результатом `RentalQuery`;
+- `QueryCache<TKey, TValue>` - generic cache для повторюваних аналітичних звітів.
+
+Ланцюжок залежностей виглядає так: фільтр формує набір оренд, LINQ-звіт агрегує саме цей набір, cache зберігає результат для стабільного `RentalQuery.CacheKey`. `RentalFacade` очищає cache після `Rent` і `Return`, щоб demo-звіт не показував застарілі дані.
+
+Обов'язкові артефакти самостійної роботи:
+
+- [docs/self-audit.md](docs/self-audit.md)
+- [docs/extension-plan.md](docs/extension-plan.md)
+- [docs/extension-report.md](docs/extension-report.md)
+- [docs/defense-checklist.md](docs/defense-checklist.md)
 
 ## Продуктивність і структури даних
 
@@ -49,6 +67,7 @@
 - `List<T>` доречний для малого навчального автопарку і простого in-memory repository.
 - `Dictionary<string, int>` використовується для підрахунку популярності моделей.
 - `HashSet<string>` використовується для унікальних клієнтів.
+- `QueryCache<TKey, TValue>` використовує `Dictionary<TKey, TValue>` для повторних звітів.
 - LINQ застосовується для фільтрації, сортування та агрегації.
 
 Поточний обсяг даних малий, тому додатковий індекс за `CarId` не потрібен. Для production-обсягу наступним кроком був би cache або repository на базі БД.
@@ -57,13 +76,13 @@
 
 ## Тестування
 
-Останній локальний прогін: 2026-05-19.
+Останній локальний прогін: 2026-05-21.
 
 - build: succeeded, 0 warnings, 0 errors;
-- tests: 217 passed, 0 failed;
-- total line coverage: 91.34%;
-- total branch coverage: 87.50%;
-- total method coverage: 91.97%.
+- tests: 220 passed, 0 failed;
+- total line coverage: 91.06%;
+- total branch coverage: 83.62%;
+- total method coverage: 92.39%.
 
 ## Компроміси
 
