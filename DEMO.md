@@ -11,7 +11,7 @@ Copy-Item docs\demo-cars.json cars.json -Force
 Запуск:
 
 ```bash
-dotnet run --project src/MyProject.Console/MyProject.Console.csproj
+dotnet run --project src/CarRentSystem.Console/CarRentSystem.Console.csproj
 ```
 
 ## Сценарій
@@ -81,7 +81,15 @@ Car ID: 33333333-3333-3333-3333-333333333333
 
 Обрати `4. Analytics`.
 
-Пояснити, що агрегації виконуються через LINQ і repository abstraction.
+Очікування:
+
+- показано `Total Revenue`;
+- показано кількість оренд і активних оренд;
+- показано середню тривалість оренди;
+- топ моделей містить кількість оренд і дохід по кожній моделі;
+- active-rental report будується через фільтр `RentalQuery.All.ActiveOnly()`.
+
+Пояснити, що аналітика проходить через delegate pipeline `RentalQuery`, LINQ-агрегації в `RentalAnalyticsService` і generic cache `QueryCache<TKey, TValue>`.
 
 ## Архітектурне пояснення для захисту
 
@@ -91,3 +99,5 @@ Car ID: 33333333-3333-3333-3333-333333333333
 - `Car`, `Rental`, `Customer` містять доменні правила.
 - `JsonDataStore<T>` відповідає за persistence і повертає `Result`, щоб контрольовано обробляти I/O failures.
 - `ApplicationEventBus` демонструє Observer для повідомлень про помилки та події.
+- `RentalQuery` демонструє делегати та lambda expressions у реальному сценарії фільтрації.
+- `QueryCache<TKey, TValue>` кешує повторювані аналітичні звіти за стабільним ключем query.

@@ -50,6 +50,8 @@ classDiagram
         +GetAvailableCars() List~Car~
         +GetRevenue() decimal
         +GetTopCars() IEnumerable
+        +GetAnalyticsReport(RentalQuery) RentalAnalyticsReport
+        +ClearAnalyticsCache()
     }
 
     class RentalAnalyticsService {
@@ -59,6 +61,34 @@ classDiagram
         +GetCarPopularity() Dictionary
         +GetUniqueCustomers() HashSet
         +GetTotalRevenue() decimal
+        +GetRentalReport(RentalQuery) RentalAnalyticsReport
+        +GetCachedRentalReport(RentalQuery) RentalAnalyticsReport
+        +ClearReportCache()
+    }
+
+    class RentalQuery {
+        +string CacheKey
+        +Where(string, Func) RentalQuery
+        +ActiveOnly() RentalQuery
+        +CustomerContains(string) RentalQuery
+        +ModelContains(string) RentalQuery
+        +MinimumDays(int) RentalQuery
+        +Apply(IEnumerable~Rental~) IEnumerable~Rental~
+    }
+
+    class RentalAnalyticsReport {
+        +int RentalCount
+        +int ActiveRentalCount
+        +decimal TotalRevenue
+        +double AverageRentalDays
+        +IReadOnlyList ModelStatistics
+        +string MostPopularModel
+    }
+
+    class QueryCache~TKey,TValue~ {
+        +int Count
+        +GetOrAdd(TKey, Func~TValue~) TValue
+        +Clear()
     }
 
     class ICarRepository {
@@ -88,7 +118,11 @@ classDiagram
     RentalService --> ICarRepository
     RentalService --> IRentalRepository
     RentalFacade --> RentalService
+    RentalFacade --> RentalAnalyticsService
     RentalAnalyticsService --> ICarRepository
     RentalAnalyticsService --> IRentalRepository
+    RentalAnalyticsService --> RentalQuery
+    RentalAnalyticsService --> RentalAnalyticsReport
+    RentalAnalyticsService --> QueryCache
     JsonDataStore ..> Car
 ```

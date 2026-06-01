@@ -1,7 +1,5 @@
 # Car Rent System
-
 [![.NET CI](https://github.com/Xsessha/OOP-MiniProject-Olkhovskay/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Xsessha/OOP-MiniProject-Olkhovskay/actions/workflows/dotnet.yml)
-
 Навчальний консольний застосунок для оренди автомобілів. Проєкт показує базові теми ООП-курсу: сутності домену, наслідування, поліморфізм, інтерфейси, репозиторії, JSON persistence, LINQ-аналітику, патерни Factory/Facade/Observer та автоматизоване тестування.
 
 ## Можливості
@@ -20,31 +18,31 @@
 
 ```bash
 dotnet restore
-dotnet run --project src/MyProject.Console/MyProject.Console.csproj
+dotnet run --project src/CarRentSystemstemstem.ConsCarRCarRentSystemject.Console.csproj
 ```
 
 Тести:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release
+dotnet test tests/CarRentSystem.Tests/CarRentSystem.Tests.csproj --configuration Release
 ```
 
 Coverage, як у CI:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
+dotnet test tests/CarRentSystem.Tests/CarRentSystem.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
 ```
 
 ## Структура
 
 ```text
 src/
-  MyProject.Domain/          доменні сутності, value objects, exceptions, interfaces
-  MyProject.Application/     use cases, facade, analytics, factories, event bus
-  MyProject.Infrastructure/  JSON persistence, repositories, serialization
-  MyProject.Console/         консольний UI
+  CarRentSystem.Domain/          доменні сутності, value objects, exceptions, interfaces
+  CarRentSystem.Application/     use cases, facade, analytics, factories, event bus
+  CarRentSystem.Infrastructure/  JSON persistence, repositories, serialization
+  CarRentSystem.Console/         консольний UI
 tests/
-  MyProject.Tests/           unit та integration tests
+  CarRentSystem.Tests/           unit та integration tests
 docs/                        UML, release plan, coverage matrix, defense materials
 ```
 
@@ -68,3 +66,9 @@ docs/                        UML, release plan, coverage matrix, defense materia
 git tag v1.0.0
 git push origin v1.0.0
 ```
+## Демонстрація 
+![Демонстрація роботи програми](image/16.png)
+![Демонстрація роботи програми](image/17.png)
+![Демонстрація роботи програми](image/18.png)
+![Демонстрація роботи програми](image/19.png)
+![Демонстрація роботи програми](image/20.png)

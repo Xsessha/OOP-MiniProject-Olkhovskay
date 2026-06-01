@@ -13,10 +13,10 @@
 
 Проєкт поділено на чотири шари:
 
-- `MyProject.Domain` - бізнес-сутності `Car`, `Customer`, `Rental`, value object `Money`, доменні винятки та repository interfaces.
-- `MyProject.Application` - use cases: `RentalService`, `RentalFacade`, `RentalAnalyticsService`, `CustomerFactory`, event bus.
-- `MyProject.Infrastructure` - in-memory repositories, JSON persistence, serialization helpers.
-- `MyProject.Console` - консольний сценарій взаємодії з користувачем.
+- `CarRentSystem.Domain` - бізнес-сутності `Car`, `Customer`, `Rental`, value object `Money`, доменні винятки та repository interfaces.
+- `CarRentSystem.Application` - use cases: `RentalService`, `RentalFacade`, `RentalAnalyticsService`, `CustomerFactory`, event bus.
+- `CarRentSystem.Infrastructure` - in-memory repositories, JSON persistence, serialization helpers.
+- `CarRentSystem.Console` - консольний сценарій взаємодії з користувачем.
 
 Залежності спрямовані всередину: application залежить від domain contracts, infrastructure реалізує ці contracts, console складає об'єкти разом.
 
@@ -65,14 +65,14 @@
 ## Тести
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release
+dotnet test tests/CarRentSystem.Tests/CarRentSystem.Tests.csproj --configuration Release
 ```
 
 Coverage:
 
 ```bash
-dotnet test tests/MyProject.Tests/MyProject.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
-reportgenerator -reports:tests/MyProject.Tests/TestResults/coverage/coverage.opencover.xml -targetdir:coverage-report -reporttypes:Html
+dotnet test tests/CarRentSystem.Tests/CarRentSystem.Tests.csproj --configuration Release --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=TestResults\coverage\ /p:Threshold=85 /p:ThresholdType=line /p:ThresholdStat=total
+reportgenerator -reports:tests/CarRentSystem.Tests/TestResults/coverage/coverage.opencover.xml -targetdir:coverage-report -reporttypes:Html
 ```
 
 ## Правила змін
