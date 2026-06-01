@@ -18,7 +18,7 @@
 
 ```bash
 dotnet restore
-dotnet run --project src/CarRentSystemstemstem.ConsCarRCarRentSystemject.Console.csproj
+dotnet run --project src/CarRentSystem.Console/CarRentSystem.Console.csproj
 ```
 
 Тести:
