@@ -1,5 +1,5 @@
 # Car Rent System
-[![.NET CI](https://github.com/Xsessha/OOP-MiniProject-Olkhovskay/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Xsessha/OOP-MiniProject-Olkhovskay/actions/workflows/dotnet.yml)
+
 Навчальний консольний застосунок для оренди автомобілів. Проєкт показує базові теми ООП-курсу: сутності домену, наслідування, поліморфізм, інтерфейси, репозиторії, JSON persistence, LINQ-аналітику, патерни Factory/Facade/Observer та автоматизоване тестування.
 
 ## Можливості
